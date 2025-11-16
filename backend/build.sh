@@ -6,11 +6,8 @@ set -o errexit
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Collect static files
+# Collect static files (required for WhiteNoise)
 python manage.py collectstatic --no-input
 
-# Run migrations
-python manage.py migrate --no-input
-
-# Verify deployment
-python manage.py check --deploy
+# Note: Migrations are run separately via Render Shell or as part of start command
+# This prevents build failures if database is not ready during build

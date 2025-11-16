@@ -5,6 +5,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
+from django.conf.urls.static import static
 
 @require_http_methods(["GET"])
 def root_view(request):
@@ -25,4 +27,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
 ]
+
+# Serve static and media files in development
+# In production, WhiteNoise handles static files, and media should be served via CDN
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

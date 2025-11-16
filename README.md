@@ -53,7 +53,9 @@ A comprehensive Real Estate CRM system built with Django REST Framework backend 
 
 ## 🛠️ Installation
 
-### Backend Setup
+### Local Development Setup
+
+#### Backend Setup
 
 ```bash
 cd backend
@@ -63,7 +65,7 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-### Frontend Setup
+#### Frontend Setup
 
 ```bash
 cd frontend
@@ -71,7 +73,7 @@ npm install
 npm run dev
 ```
 
-### Start Both Servers
+#### Start Both Servers
 
 ```powershell
 # Windows PowerShell
@@ -86,6 +88,23 @@ python manage.py runserver
 cd frontend
 npm run dev
 ```
+
+## 🚀 Production Deployment
+
+### Deploy to Render
+
+**Quick Start:**
+1. Follow the **[Step-by-Step Deployment Guide](docs/RENDER_DEPLOYMENT_STEP_BY_STEP.md)**
+2. Or use the **[Detailed Deployment Guide](docs/DEPLOYMENT_RENDER.md)**
+
+**What You'll Deploy:**
+- ✅ Django Backend (Web Service)
+- ✅ React Frontend (Static Site)
+- ✅ PostgreSQL Database
+
+**Estimated Time:** 30-45 minutes
+
+**Cost:** Free tier available (90 days), then ~$14/month for production
 
 ## 📚 Documentation
 

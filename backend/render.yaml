@@ -4,8 +4,9 @@ services:
     env: python
     region: oregon
     plan: starter
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate --no-input
-    startCommand: gunicorn zenith_crm.wsgi:application
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input
+    startCommand: gunicorn zenith_crm.wsgi:application --bind 0.0.0.0:$PORT
     healthCheckPath: /api/
     envVars:
       - key: DJANGO_SETTINGS_MODULE
@@ -19,7 +20,20 @@ services:
       - key: USE_SQLITE
         value: "False"
       - key: ALLOWED_HOSTS
+        sync: false
         value: zenith-crm-backend.onrender.com
+
+  - type: web
+    name: zenith-crm-frontend
+    env: static
+    region: oregon
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    rootDir: frontend
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false
+        value: https://zenith-crm-backend.onrender.com/api
 
 databases:
   - name: zenith-crm-db
