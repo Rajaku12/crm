@@ -89,9 +89,13 @@ npm run dev
 
 ## 📚 Documentation
 
-- **[Integration Guide](INTEGRATION_GUIDE.md)** - Complete guide for setting up all integrations
-- **[API Fixes Summary](API_FIXES_SUMMARY.md)** - Details on API improvements and error handling
-- **[Verification Checklist](INTEGRATION_VERIFICATION_CHECKLIST.md)** - Step-by-step verification guide
+All documentation is located in the `docs/` folder:
+
+- **[Integration Guide](docs/INTEGRATION_GUIDE.md)** - Complete guide for setting up all integrations
+- **[API Fixes Summary](docs/API_FIXES_SUMMARY.md)** - Details on API improvements and error handling
+- **[Verification Checklist](docs/INTEGRATION_VERIFICATION_CHECKLIST.md)** - Step-by-step verification guide
+- **[Deployment Guide](docs/DEPLOYMENT_RENDER.md)** - Production deployment instructions
+- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Project organization and structure
 
 ## 🔧 Configuration
 
@@ -134,7 +138,7 @@ npm test
 ## 📁 Project Structure
 
 ```
-Devreal_state/
+crm/
 ├── backend/                 # Django backend
 │   ├── api/               # API app
 │   │   ├── models.py     # Database models
@@ -148,7 +152,13 @@ Devreal_state/
 │   ├── services/        # API services
 │   ├── contexts/        # React contexts
 │   └── types.ts        # TypeScript types
-└── docs/                # Documentation
+├── docs/                 # Documentation
+│   ├── INTEGRATION_GUIDE.md
+│   ├── API_FIXES_SUMMARY.md
+│   ├── DEPLOYMENT_RENDER.md
+│   └── ...
+└── scripts/              # Utility scripts
+    └── github/           # GitHub-related scripts (if any)
 ```
 
 ## 🔐 Security
