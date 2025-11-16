@@ -41,3 +41,4 @@ databases:
     user: zenith_user
     plan: starter
     region: oregon
+

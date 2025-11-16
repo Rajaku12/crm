@@ -148,12 +148,14 @@ Click **"Create Web Service"**
 
 - **Name**: `zenith-crm-frontend` (or your preferred name)
 - **Branch**: `main`
-- **Root Directory**: `frontend` ⚠️ **Important!**
+- **Root Directory**: Leave **empty** or set to `.` (project root) ⚠️ **Important!**
 - **Build Command**: 
   ```bash
-  npm install && npm run build
+  cd frontend && npm install && npm run build
   ```
-- **Publish Directory**: `dist` ⚠️ **Important!**
+  ⚠️ **Important**: Use `cd frontend &&` prefix since root is project root
+- **Publish Directory**: `frontend/dist` ⚠️ **Important!**
+- **Node Version**: `18` or `20` (set in Environment section)
 
 ### 5.3 Create Service
 
