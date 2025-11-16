@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: zenith-crm-backend
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate --no-input
+    startCommand: gunicorn zenith_crm.wsgi:application
+    healthCheckPath: /api/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: zenith_crm.settings
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: USE_SQLITE
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: zenith-crm-backend.onrender.com
+
+databases:
+  - name: zenith-crm-db
+    databaseName: zenith_crm
+    user: zenith_user
+    plan: starter
+    region: oregon
