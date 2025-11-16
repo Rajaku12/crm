@@ -29,38 +29,128 @@ def initiate_outbound_call(to_number, from_number=None, lead=None, agent=None, t
     
     Returns:
         CallLog instance
+    
+    Raises:
+        ValueError: If telephony configuration is missing or invalid
+        Exception: If call initiation fails
     """
+    # Validate input
+    if not to_number:
+        raise ValueError("Destination phone number is required")
+    
+    if not isinstance(to_number, str):
+        to_number = str(to_number)
+    
+    to_number = to_number.strip()
+    if len(to_number) < 10:
+        raise ValueError("Invalid phone number format")
+    
+    # Get telephony configuration
     if not telephony_config:
         telephony_config = get_default_telephony_config()
     
     if not telephony_config:
-        raise ValueError("No active telephony configuration found")
+        raise ValueError("No active telephony configuration found. Please configure a telephony provider in Settings → Integrations.")
     
+    if not telephony_config.is_active:
+        raise ValueError("Telephony configuration is not active. Please activate it in Settings → Integrations.")
+    
+    # Get from number
     if not from_number:
         from_number = telephony_config.phone_number
     
+    if not from_number:
+        raise ValueError("Source phone number is required. Please configure a phone number in your telephony settings.")
+    
+    # Validate provider-specific credentials
+    if telephony_config.provider == TelephonyConfig.Provider.TWILIO:
+        if not telephony_config.account_sid or not telephony_config.auth_token:
+            raise ValueError("Twilio credentials are missing. Please configure Account SID and Auth Token.")
+    elif telephony_config.provider == TelephonyConfig.Provider.EXOTEL:
+        if not telephony_config.api_key or not telephony_config.auth_token:
+            raise ValueError("Exotel credentials are missing. Please configure API Key and API Token.")
+    elif telephony_config.provider == TelephonyConfig.Provider.KNOWLARITY:
+        if not telephony_config.api_key or not telephony_config.api_secret:
+            raise ValueError("Knowlarity credentials are missing. Please configure API Key and API Secret.")
+    elif telephony_config.provider == TelephonyConfig.Provider.MYOPERATOR:
+        if not telephony_config.api_key or not telephony_config.api_secret:
+            raise ValueError("MyOperator credentials are missing. Please configure API Key and API Secret.")
+    
     # Create call log
-    call_log = CallLog.objects.create(
-        direction=CallLog.Direction.OUTBOUND,
-        status=CallLog.Status.INITIATED,
-        from_number=from_number,
-        to_number=to_number,
-        lead=lead,
-        agent=agent,
-        provider=telephony_config.provider,
-        initiated_at=timezone.now()
-    )
+    try:
+        call_log = CallLog.objects.create(
+            direction=CallLog.Direction.OUTBOUND,
+            status=CallLog.Status.INITIATED,
+            from_number=from_number,
+            to_number=to_number,
+            lead=lead,
+            agent=agent,
+            provider=telephony_config.provider,
+            initiated_at=timezone.now()
+        )
+    except Exception as e:
+        logger.error(f"Failed to create call log: {e}", exc_info=True)
+        raise ValueError(f"Failed to create call log: {str(e)}")
     
     # Initiate call via provider
-    if telephony_config.provider == TelephonyConfig.Provider.TWILIO:
-        call_sid = initiate_twilio_call(
-            to_number=to_number,
-            from_number=from_number,
-            call_log=call_log,
-            config=telephony_config
-        )
-        call_log.call_sid = call_sid
+    call_sid = None
+    provider_error = None
+    
+    try:
+        if telephony_config.provider == TelephonyConfig.Provider.TWILIO:
+            call_sid = initiate_twilio_call(
+                to_number=to_number,
+                from_number=from_number,
+                call_log=call_log,
+                config=telephony_config
+            )
+        elif telephony_config.provider == TelephonyConfig.Provider.EXOTEL:
+            call_sid = initiate_exotel_call(
+                to_number=to_number,
+                from_number=from_number,
+                call_log=call_log,
+                config=telephony_config
+            )
+        elif telephony_config.provider == TelephonyConfig.Provider.KNOWLARITY:
+            call_sid = initiate_knowlarity_call(
+                to_number=to_number,
+                from_number=from_number,
+                call_log=call_log,
+                config=telephony_config
+            )
+        elif telephony_config.provider == TelephonyConfig.Provider.MYOPERATOR:
+            call_sid = initiate_myoperator_call(
+                to_number=to_number,
+                from_number=from_number,
+                call_log=call_log,
+                config=telephony_config
+            )
+        else:
+            raise ValueError(f"Unsupported telephony provider: {telephony_config.provider}")
+        
+        if call_sid:
+            call_log.call_sid = call_sid
+            call_log.save()
+        else:
+            # Provider call failed but we still have the call log
+            call_log.status = CallLog.Status.FAILED
+            call_log.save()
+            logger.warning(f"Call initiation returned no call_sid for provider {telephony_config.provider}")
+            
+    except Exception as e:
+        # Log the error but don't fail completely - we still have the call log
+        provider_error = str(e)
+        logger.error(f"Provider call initiation failed: {provider_error}", exc_info=True)
+        call_log.status = CallLog.Status.FAILED
         call_log.save()
+        
+        # Re-raise with user-friendly message
+        if 'credentials' in provider_error.lower() or 'authentication' in provider_error.lower():
+            raise ValueError("Telephony provider authentication failed. Please check your API credentials.")
+        elif 'network' in provider_error.lower() or 'connection' in provider_error.lower():
+            raise ValueError("Unable to connect to telephony provider. Please check your internet connection.")
+        else:
+            raise ValueError(f"Failed to initiate call via {telephony_config.provider}: {provider_error}")
     
     return call_log
 
@@ -77,9 +167,16 @@ def initiate_twilio_call(to_number, from_number, call_log, config):
     
     Returns:
         Call SID
+    
+    Raises:
+        Exception: If Twilio API call fails
     """
     try:
         from twilio.rest import Client
+        from twilio.base.exceptions import TwilioRestException
+        
+        if not config.account_sid or not config.auth_token:
+            raise ValueError("Twilio Account SID and Auth Token are required")
         
         client = Client(config.account_sid, config.auth_token)
         
@@ -98,11 +195,28 @@ def initiate_twilio_call(to_number, from_number, call_log, config):
             twiml=f'<Response><Say>Connecting you now.</Say></Response>'
         )
         
+        if not call or not call.sid:
+            raise ValueError("Twilio call creation failed - no call SID returned")
+        
         return call.sid
+        
+    except TwilioRestException as e:
+        # Handle Twilio-specific errors
+        error_msg = f"Twilio API error: {e.msg}"
+        if e.code == 20003:  # Authentication error
+            error_msg = "Twilio authentication failed. Please check your Account SID and Auth Token."
+        elif e.code == 21211:  # Invalid phone number
+            error_msg = f"Invalid phone number format: {to_number}"
+        elif e.code == 21608:  # Unverified caller ID
+            error_msg = f"Unverified caller ID: {from_number}. Please verify your Twilio phone number."
+        logger.error(error_msg, exc_info=True)
+        raise ValueError(error_msg)
+    except ImportError:
+        raise ValueError("Twilio library not installed. Please install it with: pip install twilio")
     except Exception as e:
-        # Log error but don't fail
-        logger.error(f"Twilio call initiation error: {e}", exc_info=True)
-        return None
+        error_msg = f"Twilio call initiation error: {str(e)}"
+        logger.error(error_msg, exc_info=True)
+        raise ValueError(error_msg)
 
 
 def process_twilio_status_webhook(request_data):
@@ -309,6 +423,191 @@ def find_or_create_lead_from_call(call_log):
     call_log.save()
     
     return lead
+
+
+def initiate_exotel_call(to_number, from_number, call_log, config):
+    """
+    Initiate call via Exotel
+    
+    Args:
+        to_number: Destination number
+        from_number: Source number
+        call_log: CallLog instance
+        config: TelephonyConfig instance
+    
+    Returns:
+        Call ID
+    """
+    try:
+        import requests
+        import base64
+        
+        subdomain = config.config.get('subdomain', '')
+        api_key = config.api_key or config.config.get('api_key', '')
+        api_token = config.auth_token or config.config.get('api_token', '')
+        
+        if not subdomain or not api_key or not api_token:
+            logger.error("Exotel configuration incomplete")
+            return None
+        
+        # Exotel API endpoint
+        url = f"https://{subdomain}.exotel.com/v1/Accounts/{api_key}/Calls/connect.json"
+        
+        # Basic authentication
+        auth_string = f"{api_key}:{api_token}"
+        auth_bytes = auth_string.encode('ascii')
+        auth_b64 = base64.b64encode(auth_bytes).decode('ascii')
+        
+        headers = {
+            'Authorization': f'Basic {auth_b64}',
+            'Content-Type': 'application/json'
+        }
+        
+        # Build callback URLs
+        base_url = config.webhook_url or config.config.get('base_url', '')
+        status_callback = f"{base_url}/api/webhooks/exotel/status/" if base_url else None
+        
+        payload = {
+            'From': from_number,
+            'To': to_number,
+            'CallerId': from_number,
+            'StatusCallback': status_callback,
+            'Record': 'true' if config.record_calls else 'false'
+        }
+        
+        response = requests.post(url, json=payload, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('Call', {}).get('Sid')
+        else:
+            logger.error(f"Exotel call initiation error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        logger.error(f"Exotel call initiation error: {e}", exc_info=True)
+        return None
+
+
+def initiate_knowlarity_call(to_number, from_number, call_log, config):
+    """
+    Initiate call via Knowlarity
+    
+    Args:
+        to_number: Destination number
+        from_number: Source number
+        call_log: CallLog instance
+        config: TelephonyConfig instance
+    
+    Returns:
+        Call ID
+    """
+    try:
+        import requests
+        import hashlib
+        import time
+        
+        api_key = config.api_key or config.config.get('api_key', '')
+        api_secret = config.api_secret or config.config.get('api_secret', '')
+        
+        if not api_key or not api_secret:
+            logger.error("Knowlarity configuration incomplete")
+            return None
+        
+        # Knowlarity API endpoint
+        url = "https://www.knowlarity.com/api/v1/call/makecall"
+        
+        # Generate authentication
+        timestamp = str(int(time.time()))
+        auth_string = f"{api_key}{api_secret}{timestamp}"
+        auth_hash = hashlib.sha256(auth_string.encode()).hexdigest()
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'X-API-KEY': api_key,
+            'X-AUTH-HASH': auth_hash,
+            'X-TIMESTAMP': timestamp
+        }
+        
+        # Build callback URLs
+        base_url = config.webhook_url or config.config.get('base_url', '')
+        status_callback = f"{base_url}/api/webhooks/knowlarity/status/" if base_url else None
+        
+        payload = {
+            'from': from_number,
+            'to': to_number,
+            'caller_id': from_number,
+            'callback_url': status_callback,
+            'record': 'true' if config.record_calls else 'false'
+        }
+        
+        response = requests.post(url, json=payload, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('call_id') or data.get('callId')
+        else:
+            logger.error(f"Knowlarity call initiation error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        logger.error(f"Knowlarity call initiation error: {e}", exc_info=True)
+        return None
+
+
+def initiate_myoperator_call(to_number, from_number, call_log, config):
+    """
+    Initiate call via MyOperator
+    
+    Args:
+        to_number: Destination number
+        from_number: Source number
+        call_log: CallLog instance
+        config: TelephonyConfig instance
+    
+    Returns:
+        Call ID
+    """
+    try:
+        import requests
+        
+        api_key = config.api_key or config.config.get('api_key', '')
+        api_secret = config.api_secret or config.config.get('api_secret', '')
+        
+        if not api_key or not api_secret:
+            logger.error("MyOperator configuration incomplete")
+            return None
+        
+        # MyOperator API endpoint
+        url = "https://api.myoperator.com/v1/call/initiate"
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'X-API-KEY': api_key,
+            'X-API-SECRET': api_secret
+        }
+        
+        # Build callback URLs
+        base_url = config.webhook_url or config.config.get('base_url', '')
+        status_callback = f"{base_url}/api/webhooks/myoperator/status/" if base_url else None
+        
+        payload = {
+            'from': from_number,
+            'to': to_number,
+            'caller_id': from_number,
+            'webhook_url': status_callback,
+            'record': config.record_calls
+        }
+        
+        response = requests.post(url, json=payload, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('call_id') or data.get('callId') or data.get('id')
+        else:
+            logger.error(f"MyOperator call initiation error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        logger.error(f"MyOperator call initiation error: {e}", exc_info=True)
+        return None
 
 
 def assign_call_to_agent(call_log, agent=None):

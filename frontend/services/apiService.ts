@@ -104,11 +104,42 @@ async function apiRequest<T>(
         }
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new ApiError(
-                errorData.detail || errorData.message || `Request failed: ${response.statusText}`,
-                response.status
-            );
+            let errorMessage = `Request failed: ${response.statusText}`;
+            let errorData: any = {};
+            
+            try {
+                const text = await response.text();
+                if (text) {
+                    errorData = JSON.parse(text);
+                    errorMessage = errorData.error || 
+                                  errorData.detail || 
+                                  errorData.message || 
+                                  (typeof errorData === 'string' ? errorData : errorMessage);
+                    
+                    // Handle validation errors
+                    if (errorData.non_field_errors) {
+                        errorMessage = Array.isArray(errorData.non_field_errors) 
+                            ? errorData.non_field_errors.join(', ') 
+                            : errorData.non_field_errors;
+                    } else if (typeof errorData === 'object' && !errorData.error && !errorData.detail && !errorData.message) {
+                        // Handle field-specific errors
+                        const fieldErrors = Object.entries(errorData)
+                            .map(([field, errors]) => {
+                                const errorList = Array.isArray(errors) ? errors : [errors];
+                                return `${field}: ${errorList.join(', ')}`;
+                            })
+                            .join('; ');
+                        if (fieldErrors) {
+                            errorMessage = fieldErrors;
+                        }
+                    }
+                }
+            } catch (parseError) {
+                // If JSON parsing fails, use the text or default message
+                errorMessage = `Request failed: ${response.statusText} (${response.status})`;
+            }
+            
+            throw new ApiError(errorMessage, response.status);
         }
 
         // Handle empty responses
@@ -709,6 +740,32 @@ export const deleteAgent = async (id: string | number): Promise<void> => {
 export const getTeams = async (): Promise<string[]> => {
     const data = await apiRequest<string[]>('/agents/teams/');
     return Array.isArray(data) ? data : [];
+};
+
+// ==================== CALLS ====================
+
+/**
+ * Initiate a call to a lead
+ */
+export const initiateCall = async (leadId: string | number, toNumber?: string): Promise<any> => {
+    const data = await apiRequest<any>(`/leads/${leadId}/initiate_call/`, {
+        method: 'POST',
+        body: JSON.stringify({ to_number: toNumber }),
+    });
+    return data;
+};
+
+/**
+ * Get call logs
+ */
+export const getCallLogs = async (): Promise<any[]> => {
+    const data = await apiRequest<any>('/call-logs/');
+    if (Array.isArray(data)) {
+        return data;
+    } else if (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) {
+        return data.results;
+    }
+    return [];
 };
 
 // ==================== CLIENTS ====================

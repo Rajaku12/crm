@@ -79,6 +79,75 @@ class LeadViewSet(viewsets.ModelViewSet):
         )
     
     @action(detail=True, methods=['post'])
+    def initiate_call(self, request, pk=None):
+        """Initiate outbound call to lead"""
+        from .services.telephony_service import initiate_outbound_call
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            lead = self.get_object()
+        except Exception as e:
+            logger.error(f"Lead not found: {e}")
+            return Response(
+                {'error': 'Lead not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Get phone number from request or lead
+        to_number = request.data.get('to_number') or lead.phone
+        
+        if not to_number:
+            return Response(
+                {'error': 'Phone number is required. Please provide a phone number for the lead.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate phone number format (basic validation)
+        if not isinstance(to_number, str) or len(to_number.strip()) < 10:
+            return Response(
+                {'error': 'Invalid phone number format. Please provide a valid phone number.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            call_log = initiate_outbound_call(
+                to_number=to_number.strip(),
+                lead=lead,
+                agent=request.user
+            )
+            
+            from .serializers import CallLogSerializer
+            serializer = CallLogSerializer(call_log)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        except ValueError as e:
+            # Handle configuration errors
+            logger.error(f"Call initiation configuration error: {e}")
+            return Response(
+                {'error': f'Call configuration error: {str(e)}. Please check your telephony settings.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            # Handle other errors
+            logger.error(f"Call initiation error: {e}", exc_info=True)
+            error_message = str(e)
+            
+            # Provide user-friendly error messages
+            if 'No active telephony configuration' in error_message:
+                error_message = 'No telephony provider is configured. Please set up a telephony provider (Twilio, Exotel, etc.) in Settings → Integrations.'
+            elif 'credentials' in error_message.lower() or 'authentication' in error_message.lower():
+                error_message = 'Telephony provider authentication failed. Please check your API credentials in Settings → Integrations.'
+            elif 'network' in error_message.lower() or 'connection' in error_message.lower():
+                error_message = 'Unable to connect to telephony provider. Please check your internet connection and try again.'
+            
+            return Response(
+                {'error': error_message}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @action(detail=True, methods=['post'])
     def add_activity(self, request, pk=None):
         """Add an activity to a lead"""
         lead = self.get_object()

@@ -1061,6 +1061,9 @@ class TelephonyConfig(models.Model):
     
     class Provider(models.TextChoices):
         TWILIO = 'Twilio', 'Twilio'
+        EXOTEL = 'Exotel', 'Exotel'
+        KNOWLARITY = 'Knowlarity', 'Knowlarity'
+        MYOPERATOR = 'MyOperator', 'MyOperator'
         PLIVO = 'Plivo', 'Plivo'
         NEXMO = 'Nexmo', 'Nexmo'
         CUSTOM = 'Custom', 'Custom'

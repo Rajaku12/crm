@@ -41,6 +41,7 @@ import { Lead, Agent, Property, ActivityType, Activity, Client } from './types';
 // Services
 // FIX: Changed import to use namespace import for freeFeaturesService as it exports multiple functions.
 import * as freeFeaturesService from './services/freeFeaturesService';
+import * as apiService from './services/apiService';
 
 // Context
 import { useAppContext } from './contexts/AppContext';
@@ -178,8 +179,60 @@ const App: React.FC = () => {
         }
     };
     
-    const handleInitiateCall = (leadId: string | number) => {
-        setActiveCallLeadId(leadId);
+    const handleInitiateCall = async (leadId: string | number) => {
+        try {
+            const lead = leads.find(l => l.id === leadId);
+            if (!lead) {
+                showToast('Lead not found', 'error');
+                return;
+            }
+            
+            // Validate phone number
+            if (!lead.phone || lead.phone.trim().length < 10) {
+                showToast('Lead phone number is invalid. Please update the lead\'s phone number.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            showToast('Initiating call...', 'success');
+            
+            // Initiate call via API
+            const callLog = await apiService.initiateCall(leadId, lead.phone);
+            
+            // Set active call lead ID for tracking
+            setActiveCallLeadId(leadId);
+            
+            // Show success message with call details
+            const callStatus = callLog?.status || 'initiated';
+            showToast(`Call ${callStatus} successfully to ${lead.phone}`, 'success');
+            
+        } catch (error: any) {
+            console.error('Call initiation error:', error);
+            
+            // Extract error message
+            let errorMessage = 'Failed to initiate call';
+            
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            } else if (error?.message) {
+                errorMessage = error.message;
+            }
+            
+            // Provide user-friendly error messages
+            if (errorMessage.includes('No telephony provider')) {
+                errorMessage = 'No telephony provider configured. Please set up Twilio or another provider in Settings → Integrations.';
+            } else if (errorMessage.includes('authentication') || errorMessage.includes('credentials')) {
+                errorMessage = 'Telephony provider authentication failed. Please check your API credentials.';
+            } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+                errorMessage = 'Network error. Please check your connection and try again.';
+            } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+                errorMessage = 'Lead not found. Please refresh the page and try again.';
+            }
+            
+            showToast(errorMessage, 'error');
+        }
     };
 
     useEffect(() => {
