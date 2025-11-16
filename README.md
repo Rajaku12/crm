@@ -1,0 +1,194 @@
+# Devreal_state - Real Estate CRM System
+
+A comprehensive Real Estate CRM system built with Django REST Framework backend and React TypeScript frontend, featuring full integration support for telephony, messaging, email, payment gateways, and CRM sync.
+
+## 🚀 Features
+
+### Core Functionality
+- **Lead Management**: Complete lead tracking, scoring, and management
+- **Property Management**: Property listings, categories, and status tracking
+- **Agent Management**: Multi-role agent system (Admin, Sales Manager, Agent, Telecaller)
+- **Call Management**: Integrated telephony with call logging, recording, and transcription
+- **Activity Tracking**: Comprehensive activity logging and history
+- **Task Management**: Task creation, assignment, and tracking
+- **Client Management**: Full client lifecycle management
+- **Deal Management**: Deal tracking from lead to closure
+- **Invoice & Payment**: Invoice generation, payment tracking, and payment plans
+- **Commission Management**: Automated commission calculation and splitting
+- **Reports & Analytics**: Comprehensive reporting and analytics dashboard
+
+### Integrations
+
+#### Telephony APIs
+- ✅ **Twilio** - Fully integrated
+- ✅ **Exotel** - Integration available
+- ✅ **Knowlarity** - Integration available
+- ✅ **MyOperator** - Integration available
+
+#### Messaging & WhatsApp
+- ✅ **WhatsApp Business** - Fully integrated via Meta Cloud API
+
+#### Email
+- ✅ **Gmail** - Fully integrated
+- ✅ **Outlook** - Integration available
+- ✅ **SMTP** - Generic SMTP support
+
+#### CRM Sync
+- ✅ **HubSpot** - Fully integrated
+- ✅ **Zoho CRM** - Integration available
+
+#### Payment Gateways
+- ✅ **Razorpay** - Fully integrated
+- ✅ **Paytm** - Integration available
+
+#### Calendar
+- ✅ **Google Calendar** - Fully integrated
+
+## 📋 Prerequisites
+
+- Python 3.8+
+- Node.js 16+
+- MySQL/PostgreSQL (or SQLite for development)
+- Git
+
+## 🛠️ Installation
+
+### Backend Setup
+
+```bash
+cd backend
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Start Both Servers
+
+```powershell
+# Windows PowerShell
+.\START_BOTH_SERVERS.ps1
+
+# Or manually:
+# Terminal 1 - Backend
+cd backend
+python manage.py runserver
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+## 📚 Documentation
+
+- **[Integration Guide](INTEGRATION_GUIDE.md)** - Complete guide for setting up all integrations
+- **[API Fixes Summary](API_FIXES_SUMMARY.md)** - Details on API improvements and error handling
+- **[Verification Checklist](INTEGRATION_VERIFICATION_CHECKLIST.md)** - Step-by-step verification guide
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env` file in the backend directory:
+
+```env
+SECRET_KEY=your-secret-key
+DEBUG=True
+DATABASE_URL=your-database-url
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+```
+
+### Telephony Configuration
+
+1. Navigate to Settings → Integrations → Telephony
+2. Configure your telephony provider (Twilio, Exotel, etc.)
+3. Enter API credentials and phone numbers
+4. Set webhook URLs for call status updates
+
+See [Integration Guide](INTEGRATION_GUIDE.md) for detailed setup instructions.
+
+## 🧪 Testing
+
+### Backend Tests
+
+```bash
+cd backend
+pytest
+```
+
+### Frontend Tests
+
+```bash
+cd frontend
+npm test
+```
+
+## 📁 Project Structure
+
+```
+Devreal_state/
+├── backend/                 # Django backend
+│   ├── api/               # API app
+│   │   ├── models.py     # Database models
+│   │   ├── views.py      # API views
+│   │   ├── serializers.py
+│   │   └── services/     # Business logic
+│   ├── zenith_crm/       # Django project settings
+│   └── manage.py
+├── frontend/              # React frontend
+│   ├── components/       # React components
+│   ├── services/        # API services
+│   ├── contexts/        # React contexts
+│   └── types.ts        # TypeScript types
+└── docs/                # Documentation
+```
+
+## 🔐 Security
+
+- JWT authentication
+- Role-based access control
+- CORS configuration
+- Environment variable management
+- Secure password handling
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📝 License
+
+[Add your license here]
+
+## 👥 Authors
+
+- **Rajaku12** - [GitHub Profile](https://github.com/Rajaku12)
+
+## 🙏 Acknowledgments
+
+- Django REST Framework
+- React
+- Twilio
+- All integration providers
+
+## 📞 Support
+
+For issues and questions:
+- Create an issue on GitHub
+- Check the documentation in the `docs/` folder
+- Review the [Integration Guide](INTEGRATION_GUIDE.md)
+
+---
+
+**Last Updated**: 2024
+
