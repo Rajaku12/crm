@@ -9,6 +9,7 @@ dj-database-url==2.1.0  # For parsing DATABASE_URL
 Pillow==10.1.0
 gunicorn==21.2.0
 whitenoise==6.6.0
+python -m pip install --upgrade pip
 
 # PDF Generation
 weasyprint==60.2
