@@ -46,8 +46,6 @@ export default defineConfig(({ mode }) => {
             assetFileNames: 'assets/[name]-[hash].[ext]'
           }
         },
-        // Copy public files (including _redirects and 404.html)
-        copyPublicDir: true,
         // Enable minification (esbuild is faster than terser)
         minify: 'esbuild',
         // Remove console.log in production

@@ -1,0 +1,114 @@
+================================================================================
+FRONTEND "NOT FOUND" ERROR - QUICK FIX
+================================================================================
+
+PROBLEM: Frontend shows "Not Found" when accessing routes or refreshing page
+
+================================================================================
+SOLUTION 1: Fix Static Site Configuration (RECOMMENDED)
+================================================================================
+
+Go to Render Dashboard → Your Frontend Service → Settings Tab
+
+VERIFY THESE SETTINGS:
+
+1. Service Type: Should be "Static Site"
+2. Root Directory: . (dot) or leave empty
+3. Build Command: cd frontend && npm install && npm run build
+4. Publish Directory: frontend/dist
+5. Environment Variable:
+   - Key: VITE_API_BASE_URL
+   - Value: https://crm-11o1.onrender.com/api
+
+THEN:
+- Click "Save Changes"
+- Go to "Manual Deploy" → "Deploy latest commit"
+- Wait for build to complete
+- Test your frontend URL
+
+================================================================================
+SOLUTION 2: Use Web Service with Server (If Solution 1 Doesn't Work)
+================================================================================
+
+STEP 1: Change Service Type
+- Go to Frontend Service → Settings
+- Change Service Type from "Static Site" to "Web Service"
+
+STEP 2: Update Settings
+- Root Directory: frontend
+- Build Command: npm install && npm run build
+- Start Command: npm start
+- Environment Variable:
+  - Key: VITE_API_BASE_URL
+  - Value: https://crm-11o1.onrender.com/api
+  - Key: PORT
+  - Value: (leave empty, Render will set it)
+
+STEP 3: Deploy
+- Click "Save Changes"
+- Go to "Manual Deploy" → "Deploy latest commit"
+- Wait for deployment
+
+================================================================================
+VERIFICATION
+================================================================================
+
+After deploying, test:
+
+1. Root URL: https://your-frontend-url.onrender.com
+   ✅ Should load login page or dashboard (NOT "Not Found")
+
+2. Direct Route: https://your-frontend-url.onrender.com/dashboard
+   ✅ Should load dashboard (NOT "Not Found")
+
+3. Refresh Test:
+   - Navigate to any route
+   - Press F5 to refresh
+   ✅ Should still load (NOT "Not Found")
+
+4. Browser Console (F12):
+   ✅ No errors in Console tab
+   ✅ All requests return 200 OK in Network tab
+
+================================================================================
+IF STILL NOT WORKING
+================================================================================
+
+1. Check Build Logs:
+   - Frontend Service → Logs tab
+   - Look for errors during build
+
+2. Verify Build Output:
+   - Check if frontend/dist/index.html exists
+   - Check if frontend/dist/js/ has JavaScript files
+
+3. Check Service Status:
+   - Make sure service shows "Live" status
+   - Not "Build Failed" or "Deploy Failed"
+
+4. Try Solution 2 (Web Service with Server)
+
+================================================================================
+QUICK CHECKLIST
+================================================================================
+
+Static Site Configuration:
+[ ] Service Type = "Static Site"
+[ ] Root Directory = . (or empty)
+[ ] Build Command = cd frontend && npm install && npm run build
+[ ] Publish Directory = frontend/dist
+[ ] VITE_API_BASE_URL environment variable set
+[ ] Service redeployed
+
+OR
+
+Web Service Configuration:
+[ ] Service Type = "Web Service"
+[ ] Root Directory = frontend
+[ ] Build Command = npm install && npm run build
+[ ] Start Command = npm start
+[ ] VITE_API_BASE_URL environment variable set
+[ ] Service redeployed
+
+================================================================================
+
