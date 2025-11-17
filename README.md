@@ -127,9 +127,15 @@ npm run dev
 
 ### Deploy to Render
 
-**Quick Start:**
-1. Follow the **[Step-by-Step Deployment Guide](docs/RENDER_DEPLOYMENT_STEP_BY_STEP.md)**
-2. Or use the **[Detailed Deployment Guide](docs/DEPLOYMENT_RENDER.md)**
+**📖 Complete Guide:** See **[DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)**
+
+The deployment guide includes everything you need:
+- ✅ Step-by-step Render setup
+- ✅ Environment variable configuration
+- ✅ API setup and configuration
+- ✅ Database setup
+- ✅ Troubleshooting guide
+- ✅ Verification checklist
 
 **What You'll Deploy:**
 - ✅ Django Backend (Web Service)
@@ -142,13 +148,7 @@ npm run dev
 
 ## 📚 Documentation
 
-All documentation is located in the `docs/` folder:
-
-- **[Integration Guide](docs/INTEGRATION_GUIDE.md)** - Complete guide for setting up all integrations
-- **[API Fixes Summary](docs/API_FIXES_SUMMARY.md)** - Details on API improvements and error handling
-- **[Verification Checklist](docs/INTEGRATION_VERIFICATION_CHECKLIST.md)** - Step-by-step verification guide
-- **[Deployment Guide](docs/DEPLOYMENT_RENDER.md)** - Production deployment instructions
-- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Project organization and structure
+- **[Complete Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Everything you need to deploy and configure the application
 
 ## 🔧 Configuration
 
@@ -170,7 +170,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
 3. Enter API credentials and phone numbers
 4. Set webhook URLs for call status updates
 
-See [Integration Guide](INTEGRATION_GUIDE.md) for detailed setup instructions.
+See [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) for detailed setup instructions.
 
 ## 🧪 Testing
 
@@ -206,10 +206,7 @@ crm/
 │   ├── contexts/        # React contexts
 │   └── types.ts        # TypeScript types
 ├── docs/                 # Documentation
-│   ├── INTEGRATION_GUIDE.md
-│   ├── API_FIXES_SUMMARY.md
-│   ├── DEPLOYMENT_RENDER.md
-│   └── ...
+│   └── DEPLOYMENT_GUIDE.md  # Complete deployment and configuration guide
 └── scripts/              # Utility scripts
     └── github/           # GitHub-related scripts (if any)
 ```
@@ -248,8 +245,8 @@ crm/
 
 For issues and questions:
 - Create an issue on GitHub
-- Check the documentation in the `docs/` folder
-- Review the [Integration Guide](INTEGRATION_GUIDE.md)
+- Check the [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) for troubleshooting
+- Review service logs on Render dashboard
 
 ---
 
