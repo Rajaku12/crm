@@ -200,7 +200,7 @@ const App: React.FC = () => {
             const callLog = await apiService.initiateCall(leadId, lead.phone);
             
             // Set active call lead ID for tracking
-            setActiveCallLeadId(leadId);
+        setActiveCallLeadId(leadId);
             
             // Show success message with call details
             const callStatus = callLog?.status || 'initiated';

@@ -1,0 +1,63 @@
+================================================================================
+RENDER PRODUCTION QUICK SETUP - COPY & PASTE
+================================================================================
+
+YOUR BACKEND URL: https://crm-11o1.onrender.com
+YOUR FRONTEND URL: [Find it in your Render Frontend Service settings]
+
+================================================================================
+BACKEND SERVICE - Environment Variables
+================================================================================
+Go to: Backend Service → Environment Tab
+
+Add/Update these:
+
+ALLOWED_HOSTS
+crm-11o1.onrender.com,localhost,127.0.0.1
+
+CORS_ALLOWED_ORIGINS
+https://your-frontend-url.onrender.com,http://localhost:5173,http://localhost:3000
+(Replace 'your-frontend-url.onrender.com' with your actual frontend URL)
+
+SECRET_KEY
+[Generate a strong secret key - use Django's secret key generator]
+
+DEBUG
+False
+
+DATABASE_URL
+[Auto-set by Render - don't change]
+
+================================================================================
+FRONTEND SERVICE - Environment Variables
+================================================================================
+Go to: Frontend Service → Environment Tab
+
+Add this:
+
+VITE_API_BASE_URL
+https://crm-11o1.onrender.com/api
+
+================================================================================
+AFTER UPDATING ENVIRONMENT VARIABLES
+================================================================================
+1. Backend Service → Manual Deploy → Deploy latest commit
+2. Frontend Service → Manual Deploy → Deploy latest commit
+3. Wait for both to finish deploying
+4. Test: https://crm-11o1.onrender.com/api/ (should show JSON)
+5. Test: Your frontend URL (should load without blank page)
+
+================================================================================
+VERIFICATION
+================================================================================
+✅ Backend API Root: https://crm-11o1.onrender.com/api/
+   Should return JSON with endpoints list
+
+✅ Frontend: Your frontend URL
+   Should load the application (not blank page)
+
+✅ Browser Console: No CORS errors
+   Open DevTools (F12) → Console tab → Check for errors
+
+================================================================================
+

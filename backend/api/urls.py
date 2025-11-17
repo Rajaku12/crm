@@ -1,7 +1,38 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from . import views
+
+# API Root View
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_root(request):
+    """API root endpoint showing all available endpoints"""
+    return Response({
+        'message': 'Zenith Estate CRM API',
+        'version': '1.0',
+        'endpoints': {
+            'authentication': {
+                'login': '/api/auth/token/',
+                'register': '/api/auth/register/',
+                'refresh_token': '/api/auth/token/refresh/',
+                'verify_token': '/api/auth/token/verify/',
+            },
+            'resources': {
+                'leads': '/api/leads/',
+                'agents': '/api/agents/',
+                'properties': '/api/properties/',
+                'clients': '/api/clients/',
+                'deals': '/api/deals/',
+                'call_logs': '/api/call-logs/',
+                'telephony_configs': '/api/telephony-configs/',
+            },
+            'documentation': 'Visit /admin/ for Django admin interface',
+        }
+    })
 
 # Create a router and register viewsets
 router = DefaultRouter()
@@ -91,6 +122,9 @@ router.register(r'credit-notes', views.CreditNoteViewSet, basename='credit-note'
 router.register(r'bank-reconciliations', views.BankReconciliationViewSet, basename='bank-reconciliation')
 
 urlpatterns = [
+    # API Root
+    path('', api_root, name='api-root'),
+    
     # JWT Authentication endpoints
     path('auth/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
