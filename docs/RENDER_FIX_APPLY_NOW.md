@@ -39,7 +39,11 @@ Your frontend build is failing with:
    **Add/Update Environment Variable:**
    - **Key**: `VITE_API_BASE_URL`
    - **Value**: `https://your-backend-url.onrender.com/api`
-   - ⚠️ Replace `your-backend-url` with your actual backend URL
+   - ⚠️ **How to find backend URL:**
+     - Go to your **Backend Service** in Render Dashboard
+     - Look at the **top** - you'll see the URL (e.g., `https://crm-11o1.onrender.com`)
+     - **Copy that URL** and add `/api` at the end
+     - Example: If backend is `https://crm-11o1.onrender.com`, use `https://crm-11o1.onrender.com/api`
 
    **Optional - Set Node Version:**
    - **Key**: `NODE_VERSION`

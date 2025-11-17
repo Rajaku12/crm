@@ -210,10 +210,19 @@ PYTHON_VERSION=3.11.0
 3. **Add:**
 
 ```bash
-VITE_API_BASE_URL=https://zenith-crm-backend.onrender.com/api
+VITE_API_BASE_URL=https://your-backend-url.onrender.com/api
 ```
 
-**⚠️ Replace** `zenith-crm-backend.onrender.com` with your actual backend URL.
+**🔍 How to Find Your Backend URL:**
+- Go to your **Backend Service** in Render Dashboard
+- Look at the **top of the page** - you'll see the URL (e.g., `https://crm-11o1.onrender.com`)
+- **Copy that URL** and add `/api` at the end
+
+**Example:**
+- If your backend URL is: `https://crm-11o1.onrender.com`
+- Then use: `https://crm-11o1.onrender.com/api`
+
+**⚠️ Important**: Always add `/api` at the end of your backend URL!
 
 ### 6.3 Save and Deploy
 
