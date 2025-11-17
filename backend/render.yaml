@@ -6,7 +6,7 @@ services:
     plan: starter
     rootDir: backend
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input
-    startCommand: gunicorn zenith_crm.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: python manage.py migrate --no-input && gunicorn zenith_crm.wsgi:application --bind 0.0.0.0:$PORT
     healthCheckPath: /api/
     envVars:
       - key: DJANGO_SETTINGS_MODULE

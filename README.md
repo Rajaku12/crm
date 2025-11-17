@@ -46,8 +46,42 @@ A comprehensive Real Estate CRM system built with Django REST Framework backend 
 
 ## 📋 Prerequisites
 
-- Python 3.8+
+- Python 3.11+
 - Node.js 16+
+- GitHub account
+- Render account (for production deployment)
+
+## 🚀 Quick Start
+
+### Local Development
+
+1. **Start Backend**:
+   ```bash
+   cd backend
+   python manage.py runserver
+   ```
+
+2. **Start Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+### Production Deployment
+
+**📖 See [Complete Deployment Guide](docs/DEPLOYMENT_GUIDE.md) for step-by-step instructions.**
+
+The deployment guide includes:
+- Render service setup
+- Environment variable configuration
+- API setup and configuration
+- Troubleshooting guide
+- Verification steps
+
+---
+
+## 📋 Prerequisites (Detailed)
 - MySQL/PostgreSQL (or SQLite for development)
 - Git
 
