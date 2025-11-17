@@ -6,11 +6,19 @@ YOUR BACKEND URL: https://crm-11o1.onrender.com
 YOUR FRONTEND URL: [Find it in your Render Frontend Service settings]
 
 ================================================================================
+WHERE TO UPDATE: Render Dashboard
+================================================================================
+1. Go to: https://dashboard.render.com
+2. Login to your Render account
+3. You'll see your services listed
+
+================================================================================
 BACKEND SERVICE - Environment Variables
 ================================================================================
-Go to: Backend Service → Environment Tab
-
-Add/Update these:
+STEP 1: Click on your Backend Service (e.g., "crm-11o1" or "zenith-crm-backend")
+STEP 2: Click on "Environment" tab (at the top)
+STEP 3: Click "Add Environment Variable" button
+STEP 4: Add/Update these one by one:
 
 ALLOWED_HOSTS
 crm-11o1.onrender.com,localhost,127.0.0.1
@@ -31,9 +39,10 @@ DATABASE_URL
 ================================================================================
 FRONTEND SERVICE - Environment Variables
 ================================================================================
-Go to: Frontend Service → Environment Tab
-
-Add this:
+STEP 1: Go back to Dashboard, click on your Frontend Service
+STEP 2: Click on "Environment" tab (at the top)
+STEP 3: Click "Add Environment Variable" button
+STEP 4: Add this:
 
 VITE_API_BASE_URL
 https://crm-11o1.onrender.com/api
